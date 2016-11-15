@@ -45,7 +45,7 @@ public class NettyGrpcServerFactory implements GrpcServerFactory {
 		NettyServerBuilder builder = NettyServerBuilder.forAddress(
 				new InetSocketAddress(InetAddresses.forString(getAddress()), getPort()));
 		for (GrpcServiceDefinition service : this.services) {
-			logger.info("Registered gRPC service: " + service.getDefinition().getName()
+			logger.info("Registered gRPC service: " + service.getDefinition().getServiceDescriptor().getName()
 					+ ", bean: " + service.getBeanName() + ", class: "
 					+ service.getBeanClazz().getName());
 			builder.addService(service.getDefinition());

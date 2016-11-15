@@ -16,15 +16,14 @@
 
 package org.springframework.boot.autoconfigure.grpc.server;
 
-import io.grpc.Server;
-
-import io.netty.channel.Channel;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import io.grpc.Server;
+import io.netty.channel.Channel;
 
 /**
  * Autoconfiguration for gRPC server.

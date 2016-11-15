@@ -19,21 +19,20 @@ package org.springframework.boot.autoconfigure.grpc.server;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import io.grpc.ServerServiceDefinition;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotationUtils;
+
+import io.grpc.ServerServiceDefinition;
 
 /**
  * Discovers gRPC service implementations by the {@link GrpcService} annotation.
@@ -72,21 +71,19 @@ public class AnnotationGrpcServiceDiscoverer
 			Method[] methods = grpcClazz.getDeclaredMethods();
 			boolean bindServiceFound = false;
 			for (Method method : methods) {
-				if (Modifier.isStatic(method.getModifiers())
-						&& method.getName().equals("bindService")) {
+				if (method.getName().equals("bindService")) {
 					bindServiceFound = true;
 					try {
-						Class<?> grpcInterfaceClazz = method.getParameterTypes()[0];
-						if (!grpcInterfaceClazz.isAssignableFrom(beanClazz)) {
+						if (!grpcClazz.isAssignableFrom(beanClazz)) {
 							throw new IllegalStateException("gRPC service class: "
 									+ bean.getClass().getName() + " does not implement "
-									+ grpcInterfaceClazz.getName());
+									+ grpcClazz.getName());
 						}
 						ServerServiceDefinition definition = (ServerServiceDefinition) method
-								.invoke(null, bean);
+								.invoke(bean);
 						definitions.add(new GrpcServiceDefinition(beanName, beanClazz,
 								definition));
-						logger.debug("Found gRPC service: " + definition.getName()
+						logger.debug("Found gRPC service: " + definition.getServiceDescriptor().getName()
 								+ ", bean: " + beanName + ", class: "
 								+ bean.getClass().getName());
 					}
@@ -103,7 +100,7 @@ public class AnnotationGrpcServiceDiscoverer
 			}
 			if (!bindServiceFound) {
 				throw new IllegalStateException(grpcClazz.getName()
-						+ " does not have a static bindService method, are you sure this is a gRPC generated class?");
+						+ " does not have a bindService method, are you sure this is a gRPC generated class?");
 			}
 		}
 		return definitions;
