@@ -17,12 +17,14 @@
 
 package org.springframework.boot.autoconfigure.grpc.client;
 
-import io.grpc.Attributes;
-import io.grpc.NameResolver;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
+import java.net.URI;
 
 import javax.annotation.Nullable;
-import java.net.URI;
+
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+
+import io.grpc.Attributes;
+import io.grpc.NameResolver;
 
 /**
  * Created by rayt on 5/17/16.

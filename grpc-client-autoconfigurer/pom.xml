@@ -32,6 +32,11 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-eureka</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-autoconfigure</artifactId>
 			<scope>provided</scope>
@@ -52,12 +57,7 @@
 			<artifactId>grpc-stub</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>io.grpc</groupId>
-			<artifactId>grpc-all</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		-->
+		<!-- <dependency> <groupId>io.grpc</groupId> <artifactId>grpc-all</artifactId> 
+			<scope>provided</scope> </dependency> -->
 	</dependencies>
 </project>

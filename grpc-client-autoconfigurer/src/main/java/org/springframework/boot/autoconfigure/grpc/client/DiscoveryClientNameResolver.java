@@ -17,16 +17,17 @@
 
 package org.springframework.boot.autoconfigure.grpc.client;
 
-import io.grpc.Attributes;
-import io.grpc.NameResolver;
-import io.grpc.ResolvedServerInfo;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+
+import io.grpc.Attributes;
+import io.grpc.NameResolver;
+import io.grpc.ResolvedServerInfo;
 
 /**
  * Created by rayt on 5/17/16.
@@ -58,12 +59,12 @@ public class DiscoveryClientNameResolver extends NameResolver {
 	public void refresh() {
 		List<List<ResolvedServerInfo>> servers = new ArrayList<>();
 		for (ServiceInstance serviceInstance : client.getInstances(name)) {
-			System.out.println("Service Instance: " + serviceInstance.getHost() + ":" + serviceInstance.getPort());
-			servers.add(Collections.singletonList(new ResolvedServerInfo(
-					InetSocketAddress.createUnresolved(serviceInstance.getHost(), serviceInstance.getPort()),
-					Attributes.EMPTY)));
+				System.out.println("Service Instance: " + serviceInstance.getHost() + ":" + serviceInstance.getPort());
+				servers.add(Collections.singletonList(new ResolvedServerInfo(
+						InetSocketAddress.createUnresolved(serviceInstance.getHost(), serviceInstance.getPort()),
+						Attributes.EMPTY)));
 		}
-		
+
 		this.listener.onUpdate(servers, Attributes.EMPTY);
 	}
 
