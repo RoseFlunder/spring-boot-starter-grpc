@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 
@@ -36,12 +37,16 @@ public class DiscoveryClientNameResolver extends NameResolver {
 	private final String name;
 	private final DiscoveryClient client;
 	private final Attributes attributes;
+	private final DiscoveryClientHeartBeatEventDispatcher dispatcher;
+
 	private Listener listener;
 
-	public DiscoveryClientNameResolver(String name, DiscoveryClient client, Attributes attributes) {
+	public DiscoveryClientNameResolver(String name, DiscoveryClient client, Attributes attributes,
+			DiscoveryClientHeartBeatEventDispatcher dispatcher) {
 		this.name = name;
 		this.client = client;
 		this.attributes = attributes;
+		this.dispatcher = dispatcher;
 	}
 
 	@Override
@@ -52,6 +57,7 @@ public class DiscoveryClientNameResolver extends NameResolver {
 	@Override
 	public void start(Listener listener) {
 		this.listener = listener;
+		dispatcher.addListener(this);
 		refresh();
 	}
 
@@ -59,10 +65,10 @@ public class DiscoveryClientNameResolver extends NameResolver {
 	public void refresh() {
 		List<List<ResolvedServerInfo>> servers = new ArrayList<>();
 		for (ServiceInstance serviceInstance : client.getInstances(name)) {
-				System.out.println("Service Instance: " + serviceInstance.getHost() + ":" + serviceInstance.getPort());
-				servers.add(Collections.singletonList(new ResolvedServerInfo(
-						InetSocketAddress.createUnresolved(serviceInstance.getHost(), serviceInstance.getPort()),
-						Attributes.EMPTY)));
+			System.out.println("Service Instance: " + serviceInstance.getHost() + ":" + serviceInstance.getPort());
+			servers.add(Collections.singletonList(new ResolvedServerInfo(
+					InetSocketAddress.createUnresolved(serviceInstance.getHost(), serviceInstance.getPort()),
+					Attributes.EMPTY)));
 		}
 
 		this.listener.onUpdate(servers, Attributes.EMPTY);
@@ -70,5 +76,6 @@ public class DiscoveryClientNameResolver extends NameResolver {
 
 	@Override
 	public void shutdown() {
+		dispatcher.removeListener(this);
 	}
 }

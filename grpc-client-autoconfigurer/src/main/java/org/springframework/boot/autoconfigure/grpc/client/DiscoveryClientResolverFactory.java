@@ -30,20 +30,22 @@ import io.grpc.NameResolver;
  * Created by rayt on 5/17/16.
  */
 public class DiscoveryClientResolverFactory extends NameResolver.Factory {
-  private final DiscoveryClient client;
+	private final DiscoveryClient client;
+	private final DiscoveryClientHeartBeatEventDispatcher dispatcher;
 
-  public DiscoveryClientResolverFactory(DiscoveryClient client) {
-    this.client = client;
-  }
+	public DiscoveryClientResolverFactory(DiscoveryClient client, DiscoveryClientHeartBeatEventDispatcher dispatcher) {
+		this.client = client;
+		this.dispatcher = dispatcher;
+	}
 
-  @Nullable
-  @Override
-  public NameResolver newNameResolver(URI targetUri, Attributes params) {
-    return new DiscoveryClientNameResolver(targetUri.toString(), client, params);
-  }
+	@Nullable
+	@Override
+	public NameResolver newNameResolver(URI targetUri, Attributes params) {
+		return new DiscoveryClientNameResolver(targetUri.toString(), client, params, dispatcher);
+	}
 
-  @Override
-  public String getDefaultScheme() {
-    return "spring";
-  }
+	@Override
+	public String getDefaultScheme() {
+		return "spring";
+	}
 }

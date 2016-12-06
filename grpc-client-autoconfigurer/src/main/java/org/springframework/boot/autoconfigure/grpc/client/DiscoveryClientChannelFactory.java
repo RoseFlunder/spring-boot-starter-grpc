@@ -29,20 +29,23 @@ import io.grpc.util.RoundRobinLoadBalancerFactory;
 public class DiscoveryClientChannelFactory implements GrpcChannelFactory {
 	private final GrpcChannelsProperties channels;
 	private final DiscoveryClient client;
+	private final DiscoveryClientHeartBeatEventDispatcher dispatcher;
 
-	public DiscoveryClientChannelFactory(GrpcChannelsProperties channels, DiscoveryClient client) {
+	public DiscoveryClientChannelFactory(GrpcChannelsProperties channels, DiscoveryClient client,
+			DiscoveryClientHeartBeatEventDispatcher dispatcher) {
 		this.channels = channels;
 		this.client = client;
+		this.dispatcher = dispatcher;
 	}
 
 	@Override
 	public Channel createChannel(String name) {
-//		Dont know why this line of code fixed the whole thing..
-//		it trigger instantiation of the eureka client works here
+		// Dont know why this line of code fixed the whole thing..
+		// it trigger instantiation of the eureka client works here
 		client.getServices();
-		
+
 		return ManagedChannelBuilder.forTarget(name)
-				.nameResolverFactory(new DiscoveryClientResolverFactory(client))
+				.nameResolverFactory(new DiscoveryClientResolverFactory(client, dispatcher))
 				.loadBalancerFactory(RoundRobinLoadBalancerFactory.getInstance())
 				.usePlaintext(channels.getChannels().get(name).isPlaintext()).build();
 	}

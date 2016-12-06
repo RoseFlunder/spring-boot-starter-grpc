@@ -34,6 +34,7 @@ import io.grpc.util.RoundRobinLoadBalancerFactory;
 
 /**
  * Autoconfiguration for gRPC clients.
+ * 
  * @author Ray Tsang
  */
 @Configuration
@@ -56,7 +57,7 @@ public class GrpcClientAutoConfiguration {
 	}
 
 	@ConditionalOnMissingBean
-	@ConditionalOnProperty(name="spring.cloud.discovery.enabled", havingValue = "false")
+	@ConditionalOnProperty(name = "spring.cloud.discovery.enabled", havingValue = "false")
 	@Bean
 	public GrpcChannelFactory defaultGrpcChannelFactory(GrpcChannelsProperties channels) {
 		return new AddressChannelFactory(channels);
@@ -71,34 +72,37 @@ public class GrpcClientAutoConfiguration {
 	@ConditionalOnMissingBean
 	@ConditionalOnBean(DiscoveryClient.class)
 	@Bean
-	public DiscoveryClientChannelFactory discoveryClientChannelFactory(GrpcChannelsProperties channels, DiscoveryClient client) {
-		return new DiscoveryClientChannelFactory(channels, client);
+	public DiscoveryClientHeartBeatEventDispatcher discoveryClientHeartBeatEventDispatcher() {
+		return new DiscoveryClientHeartBeatEventDispatcher();
+	}
+
+	@ConditionalOnMissingBean
+	@ConditionalOnBean(DiscoveryClient.class)
+	@Bean
+	public DiscoveryClientChannelFactory discoveryClientChannelFactory(GrpcChannelsProperties channels,
+			DiscoveryClient client, DiscoveryClientHeartBeatEventDispatcher dispatcher) {
+		return new DiscoveryClientChannelFactory(channels, client, dispatcher);
 	}
 
 	/*
-	@ConditionalOnMissingBean
-	@Bean
-	public AnnotationGrpcServiceDiscoverer defaultGrpcServiceFinder() {
-		return new AnnotationGrpcServiceDiscoverer();
-	}
-
-	@ConditionalOnMissingBean
-	@Bean
-	public NettyGrpcServerFactory defaultGrpcServiceFactory(
-			GrpcServerProperties properties, GrpcStubDiscoverer discoverer) {
-		NettyGrpcServerFactory factory = new NettyGrpcServerFactory(properties);
-		for (GrpcServiceDefinition service : discoverer.findGrpcServices()) {
-			factory.addService(service);
-		}
-
-		return factory;
-	}
-
-	@ConditionalOnMissingBean
-	@Bean
-	public GrpcServerLifecycle grpcServerLifecycle(
-			GrpcServerFactory factory) {
-		return new GrpcServerLifecycle(factory);
-	}
-	*/
+	 * @ConditionalOnMissingBean
+	 * 
+	 * @Bean public AnnotationGrpcServiceDiscoverer defaultGrpcServiceFinder() {
+	 * return new AnnotationGrpcServiceDiscoverer(); }
+	 * 
+	 * @ConditionalOnMissingBean
+	 * 
+	 * @Bean public NettyGrpcServerFactory defaultGrpcServiceFactory(
+	 * GrpcServerProperties properties, GrpcStubDiscoverer discoverer) {
+	 * NettyGrpcServerFactory factory = new NettyGrpcServerFactory(properties);
+	 * for (GrpcServiceDefinition service : discoverer.findGrpcServices()) {
+	 * factory.addService(service); }
+	 * 
+	 * return factory; }
+	 * 
+	 * @ConditionalOnMissingBean
+	 * 
+	 * @Bean public GrpcServerLifecycle grpcServerLifecycle( GrpcServerFactory
+	 * factory) { return new GrpcServerLifecycle(factory); }
+	 */
 }
