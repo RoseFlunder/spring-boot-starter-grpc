@@ -57,7 +57,5 @@
 			<artifactId>grpc-stub</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<!-- <dependency> <groupId>io.grpc</groupId> <artifactId>grpc-all</artifactId> 
-			<scope>provided</scope> </dependency> -->
 	</dependencies>
 </project>

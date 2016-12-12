@@ -46,8 +46,6 @@
 			<artifactId>grpc-stub</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<!-- <dependency> <groupId>io.grpc</groupId> <artifactId>grpc-all</artifactId> 
-			<scope>provided</scope> </dependency> -->
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-tcnative-boringssl-static</artifactId>
