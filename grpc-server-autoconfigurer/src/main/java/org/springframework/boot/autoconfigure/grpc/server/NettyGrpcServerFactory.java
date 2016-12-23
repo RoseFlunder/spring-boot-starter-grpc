@@ -50,6 +50,7 @@ public class NettyGrpcServerFactory implements GrpcServerFactory {
 					+ service.getBeanClazz().getName());
 			builder.addService(service.getDefinition());
 		}
+		builder.maxMessageSize(100*1024*1024);
 
 		return builder.build();
 	}

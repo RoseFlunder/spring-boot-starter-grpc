@@ -17,7 +17,7 @@
 
 package org.springframework.boot.autoconfigure.grpc.client;
 
-import io.grpc.Channel;
+import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
 /**
@@ -30,7 +30,7 @@ public class AddressChannelFactory implements GrpcChannelFactory {
   }
 
   @Override
-  public Channel createChannel(String name) {
+  public ManagedChannel createChannel(String name) {
     GrpcChannelProperties channel = channels.getChannels().get(name);
     return ManagedChannelBuilder.
         forAddress(channel.getHost(), channel.getPort()).

@@ -20,7 +20,9 @@ package org.springframework.boot.autoconfigure.grpc.client;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 
 import io.grpc.Channel;
+import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.netty.NettyChannelBuilder;
 import io.grpc.util.RoundRobinLoadBalancerFactory;
 
 /**
@@ -39,14 +41,12 @@ public class DiscoveryClientChannelFactory implements GrpcChannelFactory {
 	}
 
 	@Override
-	public Channel createChannel(String name) {
-		// Dont know why this line of code fixed the whole thing..
-		// it trigger instantiation of the eureka client works here
-		client.getServices();
-
-		return ManagedChannelBuilder.forTarget(name)
+	public ManagedChannel createChannel(String name) {
+		return NettyChannelBuilder.forTarget(name)
 				.nameResolverFactory(new DiscoveryClientResolverFactory(client, dispatcher))
 				.loadBalancerFactory(RoundRobinLoadBalancerFactory.getInstance())
-				.usePlaintext(channels.getChannels().get(name).isPlaintext()).build();
+				.usePlaintext(channels.getChannels().get(name).isPlaintext())
+				.maxMessageSize(100*1024*1024)
+				.build();
 	}
 }

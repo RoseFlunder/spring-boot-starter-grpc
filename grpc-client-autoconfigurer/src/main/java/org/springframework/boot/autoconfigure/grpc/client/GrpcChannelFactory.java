@@ -17,11 +17,11 @@
 
 package org.springframework.boot.autoconfigure.grpc.client;
 
-import io.grpc.Channel;
+import io.grpc.ManagedChannel;
 
 /**
  * Created by rayt on 5/17/16.
  */
 public interface GrpcChannelFactory {
-  public Channel createChannel(String name);
+  public ManagedChannel createChannel(String name);
 }
