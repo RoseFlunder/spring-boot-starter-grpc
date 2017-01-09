@@ -21,7 +21,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.google.common.net.InetAddresses;
+
+import io.grpc.Metadata;
 import io.grpc.Server;
+import io.grpc.ServerCall;
+import io.grpc.ServerCallHandler;
+import io.grpc.ServerInterceptor;
+import io.grpc.ServerInterceptors;
+import io.grpc.ServerCall.Listener;
 import io.grpc.netty.NettyServerBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,8 +55,19 @@ public class NettyGrpcServerFactory implements GrpcServerFactory {
 			logger.info("Registered gRPC service: " + service.getDefinition().getServiceDescriptor().getName()
 					+ ", bean: " + service.getBeanName() + ", class: "
 					+ service.getBeanClazz().getName());
-			builder.addService(service.getDefinition());
+			
+			//add interceptor to activate gzip compression in responses
+			builder.addService(ServerInterceptors.intercept(service.getDefinition(), new ServerInterceptor() {
+				@Override
+				public <ReqT, RespT> Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> call, Metadata headers,
+						ServerCallHandler<ReqT, RespT> next) {
+					call.setCompression("gzip");
+					return next.startCall(call, headers);
+				}
+			}));
 		}
+		// TODO: properties..
+		// max message size set 100 MB because heatmaps can get large
 		builder.maxMessageSize(100*1024*1024);
 
 		return builder.build();
