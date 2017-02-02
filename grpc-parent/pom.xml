@@ -17,12 +17,12 @@
 	<name>Spring Boot gRPC Starter Parent</name>
 	<description>Spring Boot gRPC Starter Parent</description>
 	<properties>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.7</maven.compiler.source>
+		<maven.compiler.target>1.7</maven.compiler.target>
 		<spring.boot.version>1.4.2.RELEASE</spring.boot.version>
 		<spring.cloud.version>Camden.SR2</spring.cloud.version>
 		<netty.version>1.1.33.Fork14</netty.version>
-		<grpc.version>1.0.2</grpc.version>
+		<grpc.version>1.0.3</grpc.version>
 		<os.plugin.version>1.4.0.Final</os.plugin.version>
 	</properties>
 	<dependencyManagement>
