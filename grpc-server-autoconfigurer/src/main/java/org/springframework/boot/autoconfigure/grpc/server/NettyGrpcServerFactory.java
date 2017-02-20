@@ -20,22 +20,24 @@ import java.net.InetSocketAddress;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.google.common.net.InetAddresses;
 
 import io.grpc.Metadata;
 import io.grpc.Server;
 import io.grpc.ServerCall;
+import io.grpc.ServerCall.Listener;
 import io.grpc.ServerCallHandler;
 import io.grpc.ServerInterceptor;
 import io.grpc.ServerInterceptors;
-import io.grpc.ServerCall.Listener;
 import io.grpc.netty.NettyServerBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Creates a Netty gRPC server using {@link NettyServerBuilder}.
  * @author Ray Tsang
+ * @author Stephan Maevers
  */
 public class NettyGrpcServerFactory implements GrpcServerFactory {
 	private static final Log logger = LogFactory.getLog(NettyGrpcServerFactory.class);
@@ -56,8 +58,8 @@ public class NettyGrpcServerFactory implements GrpcServerFactory {
 					+ ", bean: " + service.getBeanName() + ", class: "
 					+ service.getBeanClazz().getName());
 			
-			//add interceptor to activate gzip compression in responses
-			builder.addService(ServerInterceptors.intercept(service.getDefinition(), new ServerInterceptor() {
+			//Stephan Maevers: added this interceptor to activate gzip compression in responses
+			builder = builder.addService(ServerInterceptors.intercept(service.getDefinition(), new ServerInterceptor() {
 				@Override
 				public <ReqT, RespT> Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> call, Metadata headers,
 						ServerCallHandler<ReqT, RespT> next) {
@@ -66,10 +68,13 @@ public class NettyGrpcServerFactory implements GrpcServerFactory {
 				}
 			}));
 		}
-		// TODO: properties..
-		// max message size set 100 MB because heatmaps can get large
-		builder.maxMessageSize(100*1024*1024);
-
+		
+		//Stephan Maevers: Configurable max message size for large messages (e.g. heatmap service)
+		if (properties.getMaxMessageSize() > 0) {
+			logger.info("Setting max message to " + properties.getMaxMessageSize() + " MB");
+			builder = builder.maxMessageSize(properties.getMaxMessageSize()*1024*1024);
+		}
+		
 		return builder.build();
 	}
 

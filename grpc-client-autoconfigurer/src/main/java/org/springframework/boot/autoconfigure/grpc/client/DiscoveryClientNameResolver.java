@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 
@@ -32,6 +31,7 @@ import io.grpc.ResolvedServerInfo;
 
 /**
  * Created by rayt on 5/17/16.
+ * @author Stephan Maevers
  */
 public class DiscoveryClientNameResolver extends NameResolver {
 	private final String name;
@@ -57,10 +57,12 @@ public class DiscoveryClientNameResolver extends NameResolver {
 	@Override
 	public void start(Listener listener) {
 		this.listener = listener;
+		//Stephan Maevers: register this name resolver at the dispatcher to get refreshed at eureka heartbeat events
 		dispatcher.addListener(this);
 		refresh();
 	}
 
+	//Stephan Maevers: Modfied this method to be compatible with gRPC 1.0.3
 	@Override
 	public void refresh() {
 		List<List<ResolvedServerInfo>> servers = new ArrayList<>();
@@ -74,6 +76,7 @@ public class DiscoveryClientNameResolver extends NameResolver {
 		this.listener.onUpdate(servers, Attributes.EMPTY);
 	}
 
+	//Stephan Maevers: deregister from the dispatcher
 	@Override
 	public void shutdown() {
 		dispatcher.removeListener(this);

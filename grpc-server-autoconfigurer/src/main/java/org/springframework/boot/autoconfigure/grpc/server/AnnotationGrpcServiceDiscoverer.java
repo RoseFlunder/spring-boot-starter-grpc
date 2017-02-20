@@ -37,6 +37,7 @@ import io.grpc.ServerServiceDefinition;
  * Discovers gRPC service implementations by the {@link GrpcService} annotation.
  * 
  * @author Ray Tsang
+ * @author Stephan Maevers
  */
 public class AnnotationGrpcServiceDiscoverer implements ApplicationContextAware, GrpcServiceDiscoverer {
 	private static final Log logger = LogFactory.getLog(AnnotationGrpcServiceDiscoverer.class);
@@ -53,6 +54,7 @@ public class AnnotationGrpcServiceDiscoverer implements ApplicationContextAware,
 		return Collections.unmodifiableList(Arrays.asList(beanNames));
 	}
 
+	//Stephan Mävers: rewrote this method because of gRPC api changes
 	@Override
 	public Collection<GrpcServiceDefinition> findGrpcServices() {
 		Collection<String> beanNames = findGrpcServiceBeanNames();

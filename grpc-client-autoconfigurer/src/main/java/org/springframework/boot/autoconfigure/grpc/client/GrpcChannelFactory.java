@@ -23,5 +23,6 @@ import io.grpc.ManagedChannel;
  * Created by rayt on 5/17/16.
  */
 public interface GrpcChannelFactory {
-  public ManagedChannel createChannel(String name);
+	// Stephan Maevers: Changed return type to Managed Channel to allow shutdown
+	public ManagedChannel createChannel(String name);
 }

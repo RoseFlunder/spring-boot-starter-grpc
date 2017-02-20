@@ -27,21 +27,19 @@ import java.util.Map;
  */
 @ConfigurationProperties("grpc.client")
 public class GrpcChannelsProperties {
-  @NestedConfigurationProperty
-  private Map<String, GrpcChannelProperties> channels;
+	@NestedConfigurationProperty
+	private Map<String, GrpcChannelProperties> channels;
 
-  public Map<String, GrpcChannelProperties> getChannels() {
-    return channels;
-  }
+	public Map<String, GrpcChannelProperties> getChannels() {
+		return channels;
+	}
 
-  public void setChannels(Map<String, GrpcChannelProperties> channels) {
-    this.channels = channels;
-  }
+	public void setChannels(Map<String, GrpcChannelProperties> channels) {
+		this.channels = channels;
+	}
 
-  @Override
-  public String toString() {
-    return "GrpcChannelsProperties{" +
-        "channels=" + channels +
-        '}';
-  }
+	@Override
+	public String toString() {
+		return "GrpcChannelsProperties{" + "channels=" + channels + '}';
+	}
 }

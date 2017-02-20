@@ -69,6 +69,7 @@ public class GrpcClientAutoConfiguration {
 		return RoundRobinLoadBalancerFactory.getInstance();
 	}
 
+	//Stephan Maevers: Use dispatcher when Discovery Client is used
 	@ConditionalOnMissingBean
 	@ConditionalOnBean(DiscoveryClient.class)
 	@Bean
@@ -83,26 +84,4 @@ public class GrpcClientAutoConfiguration {
 			DiscoveryClient client, DiscoveryClientHeartBeatEventDispatcher dispatcher) {
 		return new DiscoveryClientChannelFactory(channels, client, dispatcher);
 	}
-
-	/*
-	 * @ConditionalOnMissingBean
-	 * 
-	 * @Bean public AnnotationGrpcServiceDiscoverer defaultGrpcServiceFinder() {
-	 * return new AnnotationGrpcServiceDiscoverer(); }
-	 * 
-	 * @ConditionalOnMissingBean
-	 * 
-	 * @Bean public NettyGrpcServerFactory defaultGrpcServiceFactory(
-	 * GrpcServerProperties properties, GrpcStubDiscoverer discoverer) {
-	 * NettyGrpcServerFactory factory = new NettyGrpcServerFactory(properties);
-	 * for (GrpcServiceDefinition service : discoverer.findGrpcServices()) {
-	 * factory.addService(service); }
-	 * 
-	 * return factory; }
-	 * 
-	 * @ConditionalOnMissingBean
-	 * 
-	 * @Bean public GrpcServerLifecycle grpcServerLifecycle( GrpcServerFactory
-	 * factory) { return new GrpcServerLifecycle(factory); }
-	 */
 }

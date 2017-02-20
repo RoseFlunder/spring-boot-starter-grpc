@@ -19,9 +19,7 @@ package org.springframework.boot.autoconfigure.grpc.client;
 
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 
-import io.grpc.Channel;
 import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import io.grpc.netty.NettyChannelBuilder;
 import io.grpc.util.RoundRobinLoadBalancerFactory;
 
@@ -31,6 +29,7 @@ import io.grpc.util.RoundRobinLoadBalancerFactory;
 public class DiscoveryClientChannelFactory implements GrpcChannelFactory {
 	private final GrpcChannelsProperties channels;
 	private final DiscoveryClient client;
+	// Stephan Maevers: added dispatcher for name resolver factory
 	private final DiscoveryClientHeartBeatEventDispatcher dispatcher;
 
 	public DiscoveryClientChannelFactory(GrpcChannelsProperties channels, DiscoveryClient client,
@@ -42,11 +41,18 @@ public class DiscoveryClientChannelFactory implements GrpcChannelFactory {
 
 	@Override
 	public ManagedChannel createChannel(String name) {
-		return NettyChannelBuilder.forTarget(name)
+		NettyChannelBuilder builder = NettyChannelBuilder.forTarget(name)
 				.nameResolverFactory(new DiscoveryClientResolverFactory(client, dispatcher))
 				.loadBalancerFactory(RoundRobinLoadBalancerFactory.getInstance())
-				.usePlaintext(channels.getChannels().get(name).isPlaintext())
-				.maxMessageSize(100*1024*1024)
-				.build();
+				.usePlaintext(channels.getChannels().get(name).isPlaintext());
+
+		if (channels.getChannels().get(name).getMaxMessageSize() > 0) {
+			// Stephan Maevers: Configurable max message size to allow large
+			// messages
+			System.out.println("Setting max message to " + channels.getChannels().get(name).getMaxMessageSize() + " MB");
+			builder = builder.maxMessageSize(channels.getChannels().get(name).getMaxMessageSize() * 1024 * 1024);
+		}
+
+		return builder.build();
 	}
 }

@@ -26,7 +26,11 @@ import org.springframework.stereotype.Service;
 
 /**
  * Use this to annotate a gRPC service implementation.
+ * 
+ * @author Ray Tsang
+ * @author Stephan.Maevers
  */
+//Stephan Maevers: modified annotation because of gRPC api changes
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

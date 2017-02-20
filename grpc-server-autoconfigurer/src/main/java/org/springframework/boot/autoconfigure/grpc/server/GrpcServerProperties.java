@@ -33,6 +33,12 @@ public class GrpcServerProperties {
 	 * Bind address for the server. Defaults to 0.0.0.0.
 	 */
 	private String address = "0.0.0.0";
+	
+	//Stephan Maevers: Added max message size property
+	/**
+	 * When value is greater than 0, this will be used for the max message size for the server
+	 */
+	private int maxMessageSize = 0;
 
 	public int getPort() {
 		return this.port;
@@ -48,5 +54,13 @@ public class GrpcServerProperties {
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public int getMaxMessageSize() {
+		return maxMessageSize;
+	}
+
+	public void setMaxMessageSize(int maxMessageSize) {
+		this.maxMessageSize = maxMessageSize;
 	}
 }

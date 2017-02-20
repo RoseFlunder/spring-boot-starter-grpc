@@ -27,6 +27,7 @@ import io.netty.channel.Channel;
 
 /**
  * Autoconfiguration for gRPC server.
+ * 
  * @author Ray Tsang
  */
 @Configuration
@@ -49,8 +50,8 @@ public class GrpcServerAutoConfiguration {
 	@ConditionalOnMissingBean
 	@ConditionalOnClass(Channel.class)
 	@Bean
-	public NettyGrpcServerFactory nettyGrpcServiceFactory(
-			GrpcServerProperties properties, GrpcServiceDiscoverer discoverer) {
+	public NettyGrpcServerFactory nettyGrpcServiceFactory(GrpcServerProperties properties,
+			GrpcServiceDiscoverer discoverer) {
 		NettyGrpcServerFactory factory = new NettyGrpcServerFactory(properties);
 		for (GrpcServiceDefinition service : discoverer.findGrpcServices()) {
 			factory.addService(service);
@@ -61,8 +62,7 @@ public class GrpcServerAutoConfiguration {
 
 	@ConditionalOnMissingBean
 	@Bean
-	public GrpcServerLifecycle grpcServerLifecycle(
-			GrpcServerFactory factory) {
+	public GrpcServerLifecycle grpcServerLifecycle(GrpcServerFactory factory) {
 		return new GrpcServerLifecycle(factory);
 	}
 }
