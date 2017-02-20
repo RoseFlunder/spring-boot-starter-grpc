@@ -27,7 +27,6 @@ public class DiscoveryClientHeartBeatEventDispatcher {
 
 	@EventListener
 	public void onEvent(HeartbeatEvent e) {
-		System.out.println("Received heart beat event");
 		for (NameResolver nameResolver : listeners) {
 			nameResolver.refresh();
 		}
