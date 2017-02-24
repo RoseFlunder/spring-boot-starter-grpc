@@ -31,6 +31,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import io.grpc.ServerInterceptor;
+import io.grpc.ServerInterceptors;
 import io.grpc.ServerServiceDefinition;
 
 /**
@@ -54,7 +56,51 @@ public class AnnotationGrpcServiceDiscoverer implements ApplicationContextAware,
 		return Collections.unmodifiableList(Arrays.asList(beanNames));
 	}
 
-	//Stephan Mävers: rewrote this method because of gRPC api changes
+//	@Override
+//	public Collection<GrpcServiceDefinition> findGrpcServices() {
+//		Collection<String> beanNames = findGrpcServiceBeanNames();
+//		List<GrpcServiceDefinition> definitions = new ArrayList<GrpcServiceDefinition>(beanNames.size());
+//		for (String beanName : beanNames) {
+//			Object bean = this.applicationContext.getBean(beanName);
+//			Class<?> beanClazz = bean.getClass();
+//			GrpcService grpcServiceAnnotation = AnnotationUtils.findAnnotation(beanClazz, GrpcService.class);
+//			Class<?> grpcClazz = grpcServiceAnnotation.value();
+//			Method[] methods = grpcClazz.getDeclaredMethods();
+//			boolean bindServiceFound = false;
+//			for (Method method : methods) {
+//				if (Modifier.isStatic(method.getModifiers()) && method.getName().equals("bindService")) {
+//					bindServiceFound = true;
+//					try {
+//						Class<?> grpcInterfaceClazz = method.getParameterTypes()[0];
+//						if (!grpcInterfaceClazz.isAssignableFrom(beanClazz)) {
+//							throw new IllegalStateException("gRPC service class: " + bean.getClass().getName()
+//									+ " does not implement " + grpcInterfaceClazz.getName());
+//						}
+//						ServerServiceDefinition definition = (ServerServiceDefinition) method.invoke(null, bean);
+//						definitions.add(new GrpcServiceDefinition(beanName, beanClazz, definition));
+//						logger.debug("Found gRPC service: " + definition.getName() + ", bean: " + beanName + ", class: "
+//								+ bean.getClass().getName());
+//					} catch (IllegalAccessException e) {
+//						throw new IllegalStateException(e);
+//					} catch (IllegalArgumentException e) {
+//						throw new IllegalStateException(e);
+//					} catch (InvocationTargetException e) {
+//						throw new IllegalStateException(e);
+//					}
+//				}
+//			}
+//			if (!bindServiceFound) {
+//				throw new IllegalStateException(grpcClazz.getName()
+//						+ " does not have a static bindService method, are you sure this is a gRPC generated class?");
+//			}
+//		}
+//		return definitions;
+//	}
+
+	// Stephan Mävers: rewrote this method because of gRPC api changes and interceptor support
+	// No interfaces and wrapper classes for services anymore, instead the
+	// method to create service definitions is part of the parent class, which
+	// leads to easier code here
 	@Override
 	public Collection<GrpcServiceDefinition> findGrpcServices() {
 		Collection<String> beanNames = findGrpcServiceBeanNames();
@@ -65,6 +111,15 @@ public class AnnotationGrpcServiceDiscoverer implements ApplicationContextAware,
 			try {
 				Method method = beanClazz.getMethod("bindService");
 				ServerServiceDefinition definition = (ServerServiceDefinition) method.invoke(bean);
+				//add interceptors
+				List<ServerInterceptor> interceptors = new ArrayList<>();
+				GrpcService annotation = applicationContext.findAnnotationOnBean(beanName, GrpcService.class);
+				if (annotation.interceptors() != null) {
+					for (Class<? extends ServerInterceptor> inteceptorClass : annotation.interceptors()) {
+						interceptors.add(inteceptorClass.newInstance());
+					}
+				}
+				definition = ServerInterceptors.intercept(definition, interceptors);
 				definitions.add(new GrpcServiceDefinition(beanName, beanClazz, definition));
 				logger.debug("Found gRPC service: " + definition.getServiceDescriptor().getName() + ", bean: "
 						+ beanName + ", class: " + bean.getClass().getName());
@@ -72,6 +127,8 @@ public class AnnotationGrpcServiceDiscoverer implements ApplicationContextAware,
 					| InvocationTargetException e1) {
 				throw new IllegalStateException(beanClazz.getName()
 						+ " does not have a bindService method, are you sure this is a gRPC generated class?");
+			} catch (InstantiationException e) {
+				logger.error("Cannot create an instance of an interceptor", e);
 			}
 		}
 		return definitions;

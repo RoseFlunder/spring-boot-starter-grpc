@@ -29,6 +29,7 @@ import io.grpc.NameResolver;
 /**
  * Created by rayt on 5/17/16.
  */
+//Stephan Maevers: Added dispatcher for heartbeat events
 public class DiscoveryClientResolverFactory extends NameResolver.Factory {
 	private final DiscoveryClient client;
 	private final DiscoveryClientHeartBeatEventDispatcher dispatcher;

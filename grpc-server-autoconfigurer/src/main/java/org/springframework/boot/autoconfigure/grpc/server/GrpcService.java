@@ -24,17 +24,44 @@ import java.lang.annotation.Target;
 
 import org.springframework.stereotype.Service;
 
+import io.grpc.ServerInterceptor;
+
 /**
  * Use this to annotate a gRPC service implementation.
  * 
  * @author Ray Tsang
  * @author Stephan.Maevers
  */
-//Stephan Maevers: modified annotation because of gRPC api changes
+// Stephan Maevers: modified annotation because of gRPC api changes
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Service
 public @interface GrpcService {
 
+	/**
+	 * The wrapper class that gRPC generator generates. For example, given a
+	 * Greeter service:
+	 * 
+	 * <pre>
+	 * service Greeter {
+	 *   rpc SayHello (HelloRequest) returns (HelloResponse) {}
+	 * }
+	 * </pre>
+	 * 
+	 * The wrapper class is <code>GreeterRpc</code>, which encapsulates an inner
+	 * interface <code>Greeter</code>. The implementation class of
+	 * <code>Greeter</code> interface should then be annotated like this:
+	 * 
+	 * <pre>
+	 * &#64;GrpcService(GreeterRpc.class)
+	 * public class GreeterImpl implements Greeter {
+	 *   ...
+	 * }
+	 * </pre>
+	 */
+	//Stephan.Maevers: This is not needed anymore, see AnnotationGrpcServiceDiscoverer
+	//Class<?> value();
+
+	Class<? extends ServerInterceptor>[] interceptors() default {};
 }

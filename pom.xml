@@ -27,6 +27,10 @@
 			<id>saturnism</id>
 			<name>Ray Tsang</name>
 		</developer>
+		<developer>
+			<id>RoseFlunder</id>
+			<name>Stephan Mävers</name>
+		</developer>
 	</developers>
 	<prerequisites>
 		<maven>3.2.1</maven>

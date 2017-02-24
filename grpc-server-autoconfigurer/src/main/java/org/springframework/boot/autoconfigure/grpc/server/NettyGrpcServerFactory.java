@@ -25,13 +25,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.google.common.net.InetAddresses;
 
-import io.grpc.Metadata;
 import io.grpc.Server;
-import io.grpc.ServerCall;
-import io.grpc.ServerCall.Listener;
-import io.grpc.ServerCallHandler;
-import io.grpc.ServerInterceptor;
-import io.grpc.ServerInterceptors;
 import io.grpc.netty.NettyServerBuilder;
 
 /**
@@ -58,15 +52,7 @@ public class NettyGrpcServerFactory implements GrpcServerFactory {
 					+ ", bean: " + service.getBeanName() + ", class: "
 					+ service.getBeanClazz().getName());
 			
-			//Stephan Maevers: added this interceptor to activate gzip compression in responses
-			builder = builder.addService(ServerInterceptors.intercept(service.getDefinition(), new ServerInterceptor() {
-				@Override
-				public <ReqT, RespT> Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> call, Metadata headers,
-						ServerCallHandler<ReqT, RespT> next) {
-					call.setCompression("gzip");
-					return next.startCall(call, headers);
-				}
-			}));
+			builder.addService(service.getDefinition());
 		}
 		
 		//Stephan Maevers: Configurable max message size for large messages (e.g. heatmap service)
