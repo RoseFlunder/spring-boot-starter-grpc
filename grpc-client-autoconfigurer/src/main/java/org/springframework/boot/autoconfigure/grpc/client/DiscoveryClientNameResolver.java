@@ -36,6 +36,7 @@ import io.grpc.ResolvedServerInfo;
 public class DiscoveryClientNameResolver extends NameResolver {
 	private final String name;
 	private final DiscoveryClient client;
+	@SuppressWarnings("unused")
 	private final Attributes attributes;
 	private final DiscoveryClientHeartBeatEventDispatcher dispatcher;
 
@@ -67,7 +68,6 @@ public class DiscoveryClientNameResolver extends NameResolver {
 	public void refresh() {
 		List<List<ResolvedServerInfo>> servers = new ArrayList<>();
 		for (ServiceInstance serviceInstance : client.getInstances(name)) {
-			System.out.println("Service Instance: " + serviceInstance.getHost() + ":" + serviceInstance.getPort());
 			servers.add(Collections.singletonList(new ResolvedServerInfo(
 					InetSocketAddress.createUnresolved(serviceInstance.getHost(), serviceInstance.getPort()),
 					Attributes.EMPTY)));

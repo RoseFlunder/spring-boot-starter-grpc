@@ -17,6 +17,8 @@
 
 package org.springframework.boot.autoconfigure.grpc.client;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 
 import io.grpc.ManagedChannel;
@@ -27,6 +29,9 @@ import io.grpc.util.RoundRobinLoadBalancerFactory;
  * Created by rayt on 5/17/16.
  */
 public class DiscoveryClientChannelFactory implements GrpcChannelFactory {
+	private static final Log logger = LogFactory
+			.getLog(DiscoveryClientChannelFactory.class);
+	
 	private final GrpcChannelsProperties channels;
 	private final DiscoveryClient client;
 	// Stephan Maevers: added dispatcher for name resolver factory
@@ -44,13 +49,13 @@ public class DiscoveryClientChannelFactory implements GrpcChannelFactory {
 		NettyChannelBuilder builder = NettyChannelBuilder.forTarget(name)
 				.nameResolverFactory(new DiscoveryClientResolverFactory(client, dispatcher))
 				.loadBalancerFactory(RoundRobinLoadBalancerFactory.getInstance())
-				.usePlaintext(channels.getChannels().get(name).isPlaintext());
+				.usePlaintext(channels.getChannelProperties(name).isPlaintext());
 
-		if (channels.getChannels().get(name).getMaxMessageSize() > 0) {
+		if (channels.getChannelProperties(name).getMaxMessageSize() > 0) {
 			// Stephan Maevers: Configurable max message size to allow large
 			// messages
-			System.out.println("Setting max message to " + channels.getChannels().get(name).getMaxMessageSize() + " MB");
-			builder = builder.maxMessageSize(channels.getChannels().get(name).getMaxMessageSize() * 1024 * 1024);
+			logger.info("Setting max message to " + channels.getChannelProperties(name).getMaxMessageSize() + " MB");
+			builder = builder.maxMessageSize(channels.getChannelProperties(name).getMaxMessageSize() * 1024 * 1024);
 		}
 
 		return builder.build();

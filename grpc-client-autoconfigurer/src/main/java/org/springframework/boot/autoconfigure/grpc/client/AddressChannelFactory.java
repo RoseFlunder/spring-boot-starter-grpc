@@ -32,7 +32,7 @@ public class AddressChannelFactory implements GrpcChannelFactory {
 	//Stephan Maevers: Changed return type to Managed Channel to be able to shutdown the channel
 	@Override
 	public ManagedChannel createChannel(String name) {
-		GrpcChannelProperties channel = channels.getChannels().get(name);
+		GrpcChannelProperties channel = channels.getChannelProperties(name);
 		return ManagedChannelBuilder.forAddress(channel.getHost(), channel.getPort())
 				.usePlaintext(channel.isPlaintext()).build();
 	}

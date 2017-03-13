@@ -33,6 +33,24 @@ public class GrpcChannelsProperties {
 	public Map<String, GrpcChannelProperties> getChannels() {
 		return channels;
 	}
+	
+	//Stephan Maevers: Added this method to allow settings for channels with a placeholder at the end
+	//Example: HeatMapService-Station-%
+	public GrpcChannelProperties getChannelProperties(String name) {
+		if (channels.containsKey(name))
+			return channels.get(name);
+		
+		for (String key : channels.keySet()) {
+			if (key.endsWith("%")) {
+				String tmp = key.replace("%", "");
+				if (name.startsWith(tmp)) {
+					return channels.get(key);
+				}
+			}
+		}
+		
+		return null;
+	}
 
 	public void setChannels(Map<String, GrpcChannelProperties> channels) {
 		this.channels = channels;
